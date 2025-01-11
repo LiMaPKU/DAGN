@@ -1,0 +1,90 @@
+{
+  "task": "DAGN-Color"  //  root/task/images-models-options
+, "model": "dagn"
+, "gpu_ids": [0,1]
+, "n_channels": 3  // broadcast to "datasets", 1 for grayscale, 3 for color
+, "merge_bn": false               // BN for DnCNN
+, "merge_bn_startpoint": 40000000  // merge BN after N iterations
+, "se_predict": "qf" // l1 | qf
+, "path": {
+  "root": "deblocking"
+, "pretrained_netG": null      // path of pretrained model
+}
+
+, "datasets": {
+  "train": {
+    "name": "train_dataset"           // just name
+  , "dataset_type": "jpeg"         // "jpeg" | "jpeggray" | "jpeggraydouble"
+  //, "dataroot_H": "/export/home/data_ml/Data_DIV2K_Flickr2K" // path of original training dataset
+  , "dataroot_H": "/home/mali/Desktop/PCL/FBCNN-main/testsets/LIVE1_color" // path of original training dataset
+  , "dataroot_L": null            // path of L training dataset
+  , "H_size": 96                  // patch size 40 | 64 | 96 | 128 | 192
+  , "dataloader_shuffle": true
+  , "dataloader_num_workers":16
+  , "dataloader_batch_size": 256     // batch size 1 | 16 | 32 | 48 | 64 | 128
+  }, "test": {
+    "name": "test_dataset"            // just name
+  , "dataset_type": "jpeg"         // "jpeg" | "jpeggray" | "jpeggraydouble"
+  , "dataroot_H":  "/home/mali/Desktop/PCL/FBCNN-main/testsets/LIVE1_color"  // path of H testing dataset
+    //      , "dataroot_L": "../testsets/Classic5/single/10"              // path of L testing dataset
+  , "dataroot_L": null              // path of L testing dataset
+  }
+}
+
+, "netG": {
+  "net_type": "dagn"
+, "in_nc": 3        // input channel number
+, "out_nc": 3 // output channel number
+, "nc": [64, 128, 256, 512] // number of channels
+, "nb": 4
+, "is_nb": 4
+, "act_mode": "BR"  // "BR" for BN+ReLU | "R" for ReLU
+, "upsample_mode": "convtranspose"  // "pixelshuffle" | "convtranspose" | "upconv"
+, "downsample_mode": "strideconv"   // "strideconv" | "avgpool" | "maxpool"
+, "fusion_mode": "nonlocal"
+, "init_type": "orthogonal"         // "orthogonal" | "normal" | "uniform" | "xavier_normal" | "xavier_uniform" | "kaiming_normal" | "kaiming_uniform"
+, "init_bn_type": "uniform"         // "uniform" | "constant"
+, "init_gain": 0.2 //
+, "split_se": true //
+}
+, "netD": {
+  "net_type": null //
+//, "in_nc": 512 //
+//, "base_nc": 512 //
+//, "act_mode": "BL" //
+//, "init_type": "orthogonal"         // "orthogonal" | "normal" | "uniform" | "xavier_normal" | "xavier_uniform" | "kaiming_normal" | "kaiming_uniform"
+//, "init_bn_type": "uniform"         // "uniform" | "constant"
+//, "init_gain": 0.2 //
+}
+, "netP": {
+  "net_type": null
+}
+, "train": {
+  "G_lossfn_type": "l1"               // "l1" preferred | "l2sum" | "l2" | "ssim"
+, "G_lossfn_weight": 1.0            // default
+, "QF_lossfn_type": "l1"
+, "QF_lossfn_weight":0.001 //1.0
+, "IS_lossfn_type": "l1"
+, "IS_lossfn_feature_weight": 0.001 //1.0
+, "IS_lossfn_image_weight": 1.0 //1.0
+, "D_lossfn_weight": 0.001 //
+
+, "G_optimizer_type": "adam"        // fixed, adam is enough
+, "G_optimizer_lr": 2e-5         // learning rate
+, "G_optimizer_clipgrad": null      // unused
+
+, "D_optimizer_lr": 1e-4         // learning rate
+
+, "G_scheduler_type": "MultiStepLR" // "MultiStepLR" is enough
+, "G_scheduler_milestones": [100000, 200000, 400000, 1600000, 1800000]
+, "G_scheduler_gamma": 0.5
+
+, "G_regularizer_orthstep": null    // unused
+, "G_regularizer_clipstep": null    // unused
+
+, "checkpoint_test": 2500           // for testing 5000
+, "checkpoint_save":  5000           // for saving model 5000
+, "checkpoint_print": 500           // for print
+}
+}
+
